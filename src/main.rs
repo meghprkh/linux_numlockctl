@@ -1,5 +1,5 @@
-use std::path::PathBuf;
-use std::{env, fs, process::exit, thread::sleep, time::Duration};
+use clap::{Parser, Subcommand};
+use std::{fs, path::PathBuf, process::exit, thread::sleep, time::Duration};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum State {
@@ -99,19 +99,37 @@ fn press_numlock() -> Result<(), uinput::Error> {
     device.release(&numlock_key)?;
     device.synchronize()?;
 
-    sleep(Duration::from_micros(100000));
+    sleep(Duration::from_micros(10000));
 
     Ok(())
 }
 
+#[derive(Debug, Clone, Copy, Subcommand, Eq, PartialEq)]
+enum Command {
+    #[command(about = "Print status of numlock [Default]")]
+    STATUS,
+    #[command(about = "Toggle numlock")]
+    TOGGLE,
+    #[command(about = "Switch on numlock")]
+    ON,
+    #[command(about = "Switch off numlock")]
+    OFF,
+}
+
+#[derive(Debug, Parser)] // requires `derive` feature
+#[command(name = "numlocklrs")]
+#[command(bin_name = "numlocklrs")]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Command>,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() > 2 {
-        println!("Invalid usage!");
-        exit(1);
-    }
+    let args = Cli::parse();
+    let command = args.command.unwrap_or(Command::STATUS);
+
     let (path, state) = get_led_path_and_state();
-    if args.len() == 1 {
+    if command == Command::STATUS {
         if state == State::ON {
             println!("Numlock is on");
         } else {
@@ -120,29 +138,10 @@ fn main() {
         exit(0)
     }
 
-    #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-    enum Action {
-        TOGGLE,
-        ON,
-        OFF,
-        INVALID,
-    }
-
-    let action = match args[1].to_uppercase().as_str() {
-        "ON" => Action::ON,
-        "OFF" => Action::OFF,
-        "TOGGLE" => Action::TOGGLE,
-        _ => Action::INVALID,
-    };
-    if action == Action::INVALID {
-        println!("Invalid usage!");
-        exit(1);
-    }
-
-    let should_toggle = match action {
-        Action::ON => state == State::OFF,
-        Action::OFF => state == State::ON,
-        Action::TOGGLE => true,
+    let should_toggle = match command {
+        Command::ON => state == State::OFF,
+        Command::OFF => state == State::ON,
+        Command::TOGGLE => true,
         _ => false,
     };
     if should_toggle {
