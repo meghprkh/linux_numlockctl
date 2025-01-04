@@ -2,7 +2,7 @@
 
 Easy way to trigger and get state of numlock in linux
 
-[Docs](https://docs.rs/linux-numlockctl/)
+[Docs](https://docs.rs/numlockctl-linux/)
 
 ## Binary
 

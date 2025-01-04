@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::process::exit;
 
-use linux_numlockctl as numlockctl;
+use numlockctl_linux as numlockctl;
 
 #[derive(Debug, Clone, Copy, Subcommand, Eq, PartialEq)]
 enum Command {

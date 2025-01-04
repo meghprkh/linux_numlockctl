@@ -1,9 +1,11 @@
 [package]
-name = "linux-numlockctl"
+name = "numlockctl-linux"
 version = "0.1.0"
 edition = "2021"
 description = "Easy way to trigger and get state of numlock in linux"
-license = "MIT"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/meghprkh/numlockctl-linux"
+homepage = "https://github.com/meghprkh/numlockctl-linux"
 
 [[bin]]
 name = "numlockctl"
